@@ -1,0 +1,29 @@
+from scapy.all import sniff, IP, TCP, UDP
+from datetime import datetime
+
+def packet_callback(packet):
+    if IP in packet:
+        ip_layer = packet[IP]
+        
+        # Determine the protocol (TCP/UDP)
+        if TCP in packet:
+            protocol = "TCP"
+        elif UDP in packet:
+            protocol = "UDP"
+        else:
+            protocol = "Other"
+        timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        
+        # Prepare the formatted output
+        output = (
+            f"Timestamp: {timestamp}\n"
+            f"Source IP: {ip_layer.src}\n"
+            f"Destination IP: {ip_layer.dst}\n"
+            f"Protocol: {protocol}\n"
+            f"Payload (truncated): {str(bytes(packet))[:80]}\n"
+            "-"*40
+        )
+        print(output)
+
+# Start sniffing the packets
+sniff(prn=packet_callback, count=10)
